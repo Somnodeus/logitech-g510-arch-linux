@@ -1,0 +1,10 @@
+[Desktop Entry]  
+Type=Application  
+Exec=/home/somnodeus/.local/bin/set_g510_color_kde_login.sh  
+Hidden=false  
+NoDisplay=false  
+X-KDE-AutostartScript=true  
+Name=Set G510 Color  
+Comment=Customize Logitech G510 Keyboard Color When Logging In to KDE
+Terminal=false  
+StartupNotify=false

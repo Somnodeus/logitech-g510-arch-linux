@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=bash -c "sleep 7 && /home/somnodeus/.local/bin/start_lcd_conky.sh"
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=LCD Conky Client
+Comment=Restarting LCD services and launching Conky→LCD client

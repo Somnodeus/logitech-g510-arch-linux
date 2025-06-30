@@ -1,5 +1,8 @@
 # This repository contains the Logitech G510 keyboard settings for Arch Linux, current as of June 2025
 
+> Attention: Don't forget to replace somnodeus with your linux user name in the configuration files from this guide! 
+> Also pay attention to the file paths. Either make the same directories or change the file paths in the scripts and configuration files.
+
 ## g15ctrld and key and screen management
 
 Jörg Hettwer wrote an excellent program g15ctrld, which works fine in 2025 on the current version of Arch Linux.
@@ -18,7 +21,10 @@ sudo rm /etc/LCDd.conf
 sudo cp /etc/LCDd.conf.pacnew /etc/LCDd.conf
 ```
 
-g15ctrld requires ydotool to work
+#### g15ctrld requires ydotool to work
+
+> Attention: You may already have ydotool installed or installed it with `paru -S g15ctrld` command, check it!
+
 ```bash
 paru -S ydotool
 ```
@@ -29,7 +35,6 @@ To autoload ydotool, you need to create a systemd service. The configuration fil
 ```bash
 sudo nano /etc/systemd/system/ydotoold.service
 ```
-
 
 ```ini
 [Unit]
@@ -54,7 +59,11 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl enable ydotool.service
 sudo systemctl start ydotool.service
+```
 
+#### Restarting services after installing the program
+
+```bash
 sudo systemctl enable --now lcdd
 sudo systemctl enable --now lcdproc
 sudo systemctl enable --now g15ctrld
@@ -78,12 +87,28 @@ Input Remapper does not conflict with g15ctrld at least until keys are assigned 
 
 Configuring `lcdproc.conf`
 ```bash
-micro /etc/lcdproc.conf
+nano /etc/lcdproc.conf
 ```
 
 There are different display options here, you need to write Active or false in the configuration file to enable or disable a specific block.
 If you want to display your own monitoring information based on the Conky configuration, see below.
 
+## Setting up buttons around the screen by replacing the LCDd file
+
+The LCDd executable file can be compiled in such a way that it will support the operation of buttons around the display. The buttons will call the menu and switch the display of widgets. For example, you can use built-in (and not disabled via `/etc/lcdproc.conf`) widgets, as well as some of your own.
+
+> Attention. Perhaps the author has already improved the application and the buttons around the screen are already working, check it out!
+
+LCDd with menu support compatible with version g15ctrld 1.6.6-1 from AUR (haven't tested with other versions)
+https://mega.nz/file/w6wSWbRQ#Wf621A11oaTIiJ4HoEr1kdL5Rzgi3AS_X3ow_69B-8o
+
+When copying, do not forget to give the LCDd file the right to execute
+```bash
+sudo mv /usr/bin/LCDd /usr/bin/LCDd.bak
+sudo cp ~/Downloads/LCDd /usr/bin/LCDd
+chmod +x /usr/bin/LCDd
+sudo systemctl restart lcdd
+```
 
 ## Configuration option for displaying monitoring on the screen via Conky
 
@@ -96,12 +121,12 @@ https://aur.archlinux.org/packages/conky-lua-nv
 paru -s conky-lua-nv
 ```
 
- Don't forget to set all blocks in the /etc/lcdproc.conf file to false!
+> Don't forget to set all blocks in the /etc/lcdproc.conf file to false! Or use a version of the LCDd file that supports buttons around the screen so that you can select the desired widget through the menu.
 
 ### Setting up Conky
 
 ```bash
-vi /home/somnodeus/.config/conky/conky_for_lcd/conky_for_lcd.conf
+nano /home/somnodeus/.config/conky/conky_for_lcd/conky_for_lcd.conf
 ```
 
 ```conf
@@ -142,7 +167,7 @@ ${alignr}root:${lua conky_fs_root_perc_padded} home:${lua conky_fs_home_perc_pad
 ```
 
 ```bash
-vi /home/somnodeus/.config/conky/conky_for_lcd/networkspeeds.lua
+nano /home/somnodeus/.config/conky/conky_for_lcd/networkspeeds.lua
 ```
 
 ```lua
@@ -168,9 +193,7 @@ end
 
 function conky_uploadspeed_formatted()    
     local speed_str = conky_parse("${upspeed enp7s0}")
-    local val_mbps = 0
-
-    
+    local val_mbps = 0    
     
     local num_part = string.match(speed_str, "([%d%.,]+)") 
     local unit_part = string.match(speed_str, "[%a]+$")    
@@ -241,7 +264,7 @@ end
 ### Script
 
 ```bash
-vi /home/somnodeus/.config/0_my/my_lcd_client.py
+nano /home/somnodeus/.config/0_my/my_lcd_client.py
 ```
 
 ```python
@@ -253,7 +276,6 @@ HOST = 'localhost'
 PORT = 13666       
 SCREEN_DURATION = 5
 
-
 def send_command(sock, command):
     """Sends a command to LCDd and returns the response."""
     try:
@@ -263,7 +285,6 @@ def send_command(sock, command):
     except socket.error as e:
         print(f"Socket error during send/receive: {e}")
         return None
-
 
 def main():
     sock = None
@@ -320,7 +341,6 @@ def main():
             print("Closing connection to LCDd.")
             sock.close()
 
-
 if __name__ == '__main__':
     main()
 
@@ -369,7 +389,7 @@ Exec=bash -c "sleep 7 && /home/somnodeus/.local/bin/start_lcd_conky.sh"
 Hidden=false
 X-GNOME-Autostart-enabled=true
 Name=LCD Conky Client
-Comment=Перезапуск LCD-сервисов и запуск Conky→LCD клиента
+Comment=Restarting LCD services and launching Conky→LCD client
 ```
 
 * The next time you log into KDE, this script will be automatically run.
@@ -408,7 +428,7 @@ Accordingly, R, G and B are given separately and the final color is obtained.
 ### systemd service to set color at boot
 
 ```bash
-sudo vi /usr/local/bin/set_g510_color.sh
+sudo nano /usr/local/bin/set_g510_color.sh
 ```
 
 ```bash
@@ -501,7 +521,7 @@ chmod +x ~/.local/bin/set_g510_color_kde_login.sh
 ```
 
 ```bash
-micro ~/.config/autostart/set_g510_color.desktop
+nano ~/.config/autostart/set_g510_color.desktop
 ```
 
 ```
@@ -517,7 +537,6 @@ Terminal=false
 StartupNotify=false
 ```
 
-
 ```bash
 sudo visudo
 ```
@@ -530,7 +549,7 @@ somnodeus ALL=(root) NOPASSWD: /usr/bin/tee /sys/class/leds/g15\:\:kbd_backlight
 
 
 ```bash
-vi  g510_control.py
+nano  g510_control.py
 ```
 
 ```python
@@ -657,9 +676,8 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
-
 ```bash
-vi g510_control.desktop
+nano g510_control.desktop
 ```
 
 ```ini
@@ -672,5 +690,4 @@ Icon=/home/somnodeus/.config/0_my/logitech_g510.png
 Terminal=false
 Type=Application
 Categories=Settings;Utility;
-
 ```

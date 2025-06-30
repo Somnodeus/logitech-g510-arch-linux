@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c22d", RUN+="/bin/sh -c 'sudo systemctl stop lcdd && sudo systemctl stop lcdproc && sudo systemctl stop g15ctrld && sudo systemctl start lcdd && sudo systemctl start lcdproc && sudo systemctl start g15ctrld'"

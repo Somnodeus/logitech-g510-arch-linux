@@ -1,0 +1,10 @@
+[Unit]
+Description=Set Logitech G510 Keyboard Backlight Color
+After=sys-devices-platform.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/set_g510_color.sh
+
+[Install]
+WantedBy=multi-user.target

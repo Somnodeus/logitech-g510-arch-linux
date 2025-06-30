@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="g15::kbd_backlight", RUN+="/bin/sh -c 'echo \"255 255 255\" > /sys/class/leds/g15::kbd_backlight/multi_intensity'"

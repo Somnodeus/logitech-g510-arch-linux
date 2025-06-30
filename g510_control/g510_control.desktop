@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Logitech G510 Control
+Comment=Control backlight for Logitech G510 keyboard
+Exec=python3 /home/somnodeus/.config/0_my/g510_control.py
+Icon=/home/somnodeus/.config/0_my/logitech_g510.png
+Terminal=false
+Type=Application
+Categories=Settings;Utility;

@@ -1,0 +1,16 @@
+[Unit]
+Description=ydotoold daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/ydotoold
+Restart=always
+User=root
+Group=input
+CapabilityBoundingSet=CAP_SYS_ADMIN
+ProtectSystem=full
+ProtectHome=yes
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
