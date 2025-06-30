@@ -102,7 +102,7 @@ The LCDd executable file can be compiled in such a way that it will support the 
 LCDd with menu support compatible with version g15ctrld 1.6.6-1 from AUR (haven't tested with other versions)
 https://mega.nz/file/w6wSWbRQ#Wf621A11oaTIiJ4HoEr1kdL5Rzgi3AS_X3ow_69B-8o
 
-When copying, do not forget to give the LCDd file the right to execute
+When copying, remember to make the LCDd file executable.
 ```bash
 sudo mv /usr/bin/LCDd /usr/bin/LCDd.bak
 sudo cp ~/Downloads/LCDd /usr/bin/LCDd
