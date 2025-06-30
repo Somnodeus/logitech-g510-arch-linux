@@ -1,12 +1,12 @@
 # This repository contains the Logitech G510 keyboard settings for Arch Linux, current as of June 2025
 
-## g15daemon and key and screen management
+## g15ctrld and key and screen management
 
 Jörg Hettwer wrote an excellent program g15ctrld, which works fine in 2025 on the current version of Arch Linux.
 https://gitlab.com/raycollector/g15ctrld
-https://aur.archlinux.org/packages/g15daemon
+https://aur.archlinux.org/packages/g15ctrld
 
-### Installing g15daemon
+### Installing g15ctrld
 
 ```bash
 paru -S g15ctrld
@@ -18,7 +18,7 @@ sudo rm /etc/LCDd.conf
 sudo cp /etc/LCDd.conf.pacnew /etc/LCDd.conf
 ```
 
-g15daemon requires ydotool to work
+g15ctrld requires ydotool to work
 ```bash
 paru -S ydotool
 ```
@@ -62,19 +62,19 @@ sudo systemctl enable --now ydotoold
 sudo shutdown -r now
 ```
 
-### Setting up keys in g15daemon
+### Setting up keys in g15ctrld
 
 To record a macro on a button in the desired mode M1, M2 or M3, you need to press MR, press the key combination and press the desired button, for example G18.
 
 To erase a macro from the G18 button, you need to press MR, and then G18.
 
-An alternative option that works with g15daemon if nothing is configured for the desired key in g15daemon is to use the Input Remapper program.
+An alternative option that works with g15ctrld if nothing is configured for the desired key in g15ctrld is to use the Input Remapper program.
 https://github.com/sezanzeb/input-remapper
 
 In Input Remapper, everything is configured through the GUI, it is intuitive.
-Input Remapper does not conflict with g15daemon at least until keys are assigned in g15daemon.
+Input Remapper does not conflict with g15ctrld at least until keys are assigned in g15ctrld.
 
-### Setting up the screen in g15daemon
+### Setting up the screen in g15ctrld
 
 Configuring `lcdproc.conf`
 ```bash
