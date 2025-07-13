@@ -1,7 +1,28 @@
-# This repository contains the Logitech G510 keyboard settings for Arch Linux, current as of June 2025
+# This repository contains the Logitech G510 keyboard settings for Arch Linux, current as of July 2025
 
 > Attention: Don't forget to replace somnodeus with your linux user name in the configuration files from this guide! 
 > Also pay attention to the file paths. Either make the same directories or change the file paths in the scripts and configuration files.
+
+Version: 1.1.
+
+# About this guide
+
+To fully utilize your **Logitech G510 keyboard** in Arch Linux, you need to configure three main functions:
+1.  **G-keys functionality** with macro recording.
+2.  **LCD screen usability**.
+3.  **Backlight brightness and color adjustment**.
+
+For configuring the **G-keys** and the **LCD screen**, this guide will detail using the **g15ctrld** application.
+
+Alternatively, for **G-keys configuration**, you can simply use the **Input Remapper** application.
+
+For **backlight brightness and color adjustment**, you have several options:
+* **g15ctrld application** via the LCD screen.
+* **Terminal commands**.
+* **KDE functions** (partial support).
+* **Python script**.
+
+All these methods are covered in this guide. Additionally, the guide explains how to set up the display of custom monitoring parameters from the **Conky application** using a Python script.
 
 ## g15ctrld and key and screen management
 
@@ -17,8 +38,10 @@ paru -S g15ctrld
 
 Next, we copy the configuration file
 ```bash
-sudo rm /etc/LCDd.conf
-sudo cp /etc/LCDd.conf.pacnew /etc/LCDd.conf
+sudo mv /etc/LCDd.conf.pacnew /etc/LCDd.conf
+sudo rm /usr/bin/LCDd
+sudo cp /usr/bin/LCDd-menu /usr/bin/LCDd
+sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
 ```
 
 #### g15ctrld requires ydotool to work
@@ -30,7 +53,6 @@ paru -S ydotool
 ```
 
 To autoload ydotool, you need to create a systemd service. The configuration file option can be taken from the repository https://gitlab.com/raycollector/g15ctrld
-
 
 ```bash
 sudo nano /etc/systemd/system/ydotoold.service
@@ -71,6 +93,52 @@ sudo systemctl enable --now ydotoold
 sudo shutdown -r now
 ```
 
+> If you encounter an error when starting the `lcdd` service, it's likely due to an incorrect `lcdproc.conf` configuration file. You'll need to download the correct configuration file from the `g15ctrld` repository.
+
+**Example Error**
+
+When trying to enable and start the `lcdd` service, you might see an error similar to this:
+
+```bash
+sudo systemctl enable --now lcdd
+```
+```
+Job for lcdd.service failed because the control process exited with error code.
+See "systemctl status lcdd.service" and "journalctl -xeu lcdd.service" for details.
+```
+
+**How to Fix the Error**
+
+To resolve this, download the correct `lcdproc.conf` file and then restart the relevant services:
+
+```bash
+sudo wget -O /etc/lcdproc.conf https://gitlab.com/raycollector/g15ctrld/-/raw/main/lcdproc.conf
+sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
+```
+
+### Complete Uninstallation of g15ctrld for Reinstallation
+
+> **Warning**: This will erase all your settings!
+
+```bash
+sudo rm /var/lib/g15ctrld/g15editor.txt
+sudo rm /var/lib/g15ctrld/macros.txt
+sudo rm /etc/lcdproc.conf
+sudo rm /var/lib/g15ctrld/g15config.txt
+sudo rm /etc/LCDd.conf
+paru -R g15ctrld
+```
+
+### Complete Reinstallation of g15ctrld
+
+```bash
+paru -S g15ctrld --rebuild
+sudo mv /etc/LCDd.conf.pacnew /etc/LCDd.conf
+sudo rm /usr/bin/LCDd
+sudo cp /usr/bin/LCDd-menu /usr/bin/LCDd
+sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
+```
+
 ### Setting up keys in g15ctrld
 
 To record a macro on a button in the desired mode M1, M2 or M3, you need to press MR, press the key combination and press the desired button, for example G18.
@@ -81,7 +149,8 @@ An alternative option that works with g15ctrld if nothing is configured for the 
 https://github.com/sezanzeb/input-remapper
 
 In Input Remapper, everything is configured through the GUI, it is intuitive.
-Input Remapper does not conflict with g15ctrld at least until keys are assigned in g15ctrld.
+
+When **Input Remapper** is enabled for the Logitech G510 keyboard, it completely blocks the functionality of `g15ctrld`'s buttons. This behavior can be managed by temporarily enabling or disabling Input Remapper's control over the keyboard. Simply click the "Stop" button in the Logitech G510 section within Input Remapper.
 
 ### Setting up the screen in g15ctrld
 
@@ -95,20 +164,93 @@ If you want to display your own monitoring information based on the Conky config
 
 ## Setting up buttons around the screen by replacing the LCDd file
 
+Please note, when working with the five buttons around the LCD screen of your Logitech G510 keyboard, there are two possible approaches:
+
+- You can simply assign macros to them using **Input Remapper**.    
+- You can use them to interact with the menu provided by **g15ctrld**. This menu allows you to enable or disable specific monitoring widgets until the next reboot, as well as adjust the backlight brightness and color of your Logitech G510 keyboard.
+
+### About LCDd executable file
+
 The LCDd executable file can be compiled in such a way that it will support the operation of buttons around the display. The buttons will call the menu and switch the display of widgets. For example, you can use built-in (and not disabled via `/etc/lcdproc.conf`) widgets, as well as some of your own.
 
-> Attention. Perhaps the author has already improved the application and the buttons around the screen are already working, check it out!
+If, during the `g15ctrld` installation, you executed the command `sudo cp /usr/bin/LCDd-menu /usr/bin/LCDd`, you have the **LCDd executable with menu button support** enabled. If you skipped this step, your LCDd executable was compiled without support for the buttons surrounding the screen.
 
-LCDd with menu support compatible with version g15ctrld 1.6.6-1 from AUR (haven't tested with other versions)
-https://mega.nz/file/w6wSWbRQ#Wf621A11oaTIiJ4HoEr1kdL5Rzgi3AS_X3ow_69B-8o
+### LCD Screen Menu from g15ctrld
 
-When copying, remember to make the LCDd file executable.
-```bash
-sudo mv /usr/bin/LCDd /usr/bin/LCDd.bak
-sudo cp ~/Downloads/LCDd /usr/bin/LCDd
-chmod +x /usr/bin/LCDd
-sudo systemctl restart lcdd
+**g15ctrld** includes several programs, one of which is an application for displaying information on the LCD screen. When you press the button to the left of the screen, a menu like this appears:
+
 ```
+* LCDproc Menu:
+    * Options
+    * Lcdproc <<My hostname>>
+    * g15ctrld
+```
+
+> **Note**: `g15ctrld` is a collection of programs, and the author of `g15ctrld` is only responsible for the `g15ctrld` section within this menu.
+
+Here's a brief overview of the menu sections:
+
+  * **Options**: Contains nothing particularly useful.
+  * **Lcdproc**: Allows you to select active widgets built into `g15ctrld`. If you want these changes to persist after a reboot, refer to the "Setting up the screen in g15ctrld" section of this guide.
+  * **g15ctrld**: Manages the keyboard's backlight brightness and color. These settings will persist after a reboot.
+
+More details on backlight control will be provided later in this guide.
+
+### Configuring Built-in g15ctrld Widgets on the LCD Screen
+
+In this guide, any program that displays information on the screen, such as CPU monitoring, will be referred to as a **widget**.
+
+If you see the following output on your screen, it means no widget is currently enabled for display:
+
+```
+> **LCDproc Server**
+> **Clients: 2**
+> **Screens: 3**
+```
+
+Instructions on how to configure these built-in widgets are covered in the "Setting up the screen in g15ctrld" section of this guide.
+
+### g15ctrld Configuration Files
+
+Here are the key configuration files for **g15ctrld**:
+
+`/etc/lcdproc.conf`
+
+This file handles widget configuration. Refer to the "Setting up the screen in g15ctrld" section for details.
+   
+`/etc/LCDd.conf`
+
+This file configures the LCDd program. For example, you can reassign the functions of the buttons around the screen within the linux_input block:
+   
+```
+key=0x2b8,Escape  
+key=0x2b9,Left  
+key=0x2ba,Down  
+key=0x2bb,Up  
+key=0x2bc,Enter
+```
+
+`/var/lib/g15ctrld/g15config.txt`
+
+This is the main configuration file for g15ctrld. It stores the backlight brightness and color values for the keyboard, as well as the state of the calculator and notepad features.
+
+```
+note=false  
+backlight=255  
+red=255  
+green=255  
+blue=255
+```
+
+`/var/lib/g15ctrld/g15editor.txt`
+
+This file is related to g15ctrld's notepad function.
+
+> You can find more information about the notepad and calculator features in g15ctrld on the program's GitLab page: [https://gitlab.com/raycollector/g15ctrld](https://gitlab.com/raycollector/g15ctrld)
+
+`/var/lib/g15ctrld/macros.txt`
+
+This file stores the macros assigned to your G-keys.
 
 ## Configuration option for displaying monitoring on the screen via Conky
 
@@ -121,9 +263,17 @@ https://aur.archlinux.org/packages/conky-lua-nv
 paru -s conky-lua-nv
 ```
 
-> Don't forget to set all blocks in the /etc/lcdproc.conf file to false! Or use a version of the LCDd file that supports buttons around the screen so that you can select the desired widget through the menu.
+ > Please note: When this script is running, all other widgets will stop functioning until `g15ctrld` is restarted!
+ >  You can restart `g15ctrld` using the following command:
+```bash
+sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
+```
 
 ### Setting up Conky
+
+> Notes on Configuration
+1. **Modify paths and usernames**: Be sure to change the directory paths and usernames in the configuration to match your specific setup.
+2. **Conky configuration**: The provided **Conky configuration** is tailored to my system. You'll need to adapt it to your own computer's specifications and preferences.
 
 ```bash
 nano /home/somnodeus/.config/conky/conky_for_lcd/conky_for_lcd.conf
@@ -258,7 +408,6 @@ function conky_downloadspeed_formatted()
     formatted_mbps = string.gsub(formatted_mbps, "%.", ",")
     return formatted_mbps
 end
-
 ```
 
 ### Script
@@ -409,7 +558,16 @@ The script will run automatically when you log in.
 
 If something doesn't work (e.g. services don't restart without password), check `sudoers` and service paths. Otherwise, this is a solid way to integrate your client into KDE startup.
 
-## Commands for adjusting screen brightness and backlighting Logitech G510
+## Screen brightness and backlighting Logitech G510
+
+### Issue with Persistent Keyboard Backlight Color Changes in KDE
+
+If you're using **KDE** and your keyboard backlight constantly changes to a specific color upon booting your computer, you can disable this behavior. Look for the backlight control button in your system tray, near the clock. It typically looks like a standard brightness icon — a half-filled sun with rays.
+
+You can find more detailed information about this issue in my post on **discuss.kde.org**.
+https://discuss.kde.org/t/issue-unwanted-automatic-backlight-color-change-on-logitech-gaming-keyboards-plasma-update/36974
+
+### Commands for adjusting screen brightness and backlighting Logitech G510
 
 Backlighting brightness is changed by the command
 ```bash
@@ -423,9 +581,19 @@ echo 255 255 255 | sudo tee /sys/class/leds/g15::kbd_backlight/multi_intensity
 ```
 Accordingly, R, G and B are given separately and the final color is obtained.
 
-## Permanent backlight setting in Garuda Linux
+### Managing Backlight Brightness and Color via g15ctrld
 
-### systemd service to set color at boot
+To control the **backlight brightness and color** of your Logitech G510 keyboard using **g15ctrld**, refer to the "LCD Screen Menu from g15ctrld" section of this guide.
+
+### Managing Backlight Brightness in KDE
+
+In **KDE**, you can manage backlight brightness through the menu accessed via the **backlight control button** in your system tray, located near the clock. This button typically appears as a standard brightness icon—a half-filled sun with rays.
+
+### Permanent backlight setting in Garuda Linux
+
+> Please note! If you're using **g15ctrld**, the settings discussed in this section will likely not be necessary for you.
+
+#### systemd service to set color at boot
 
 ```bash
 sudo nano /usr/local/bin/set_g510_color.sh
@@ -469,7 +637,7 @@ sudo systemctl start g510-backlight.service
 systemctl status g510-backlight.service
 ```
 
-### Additionally, you can configure udev
+#### Additionally, you can configure udev
 
 Restore color when reconnecting the keyboard
 
@@ -501,7 +669,7 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
 
-### And also when entering KDE
+#### And also when entering KDE
 
 ```bash
 nano ~/.local/bin/set_g510_color_kde_login.sh
