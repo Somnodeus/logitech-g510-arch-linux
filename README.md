@@ -112,6 +112,13 @@ See "systemctl status lcdd.service" and "journalctl -xeu lcdd.service" for detai
 To resolve this, download the correct `lcdproc.conf` file and then restart the relevant services:
 
 ```bash
+sudo cp /etc/lcdproc.conf.pacnew /etc/lcdproc.conf
+sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
+```
+
+or
+
+```bash
 sudo wget -O /etc/lcdproc.conf https://gitlab.com/raycollector/g15ctrld/-/raw/main/lcdproc.conf
 sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
 ```
@@ -136,6 +143,7 @@ paru -S g15ctrld --rebuild
 sudo mv /etc/LCDd.conf.pacnew /etc/LCDd.conf
 sudo rm /usr/bin/LCDd
 sudo cp /usr/bin/LCDd-menu /usr/bin/LCDd
+sudo cp /etc/lcdproc.conf.pacnew /etc/lcdproc.conf
 sudo systemctl restart lcdd && sudo systemctl restart lcdproc && sudo systemctl restart g15ctrld && sudo systemctl restart ydotoold
 ```
 
